@@ -7,13 +7,13 @@ import { useAuth } from "@clerk/clerk-expo";
 const Home = () => {
   const { isLoaded, isSignedIn } = useAuth();
 
-  // if (!isLoaded) {
-  //   return <Text>Loading...</Text>;
-  // }
+  if (!isLoaded) {
+    return <Text>Loading...</Text>;
+  }
 
-  // if (isSignedIn) {
-  //   return <Redirect href="/(root)/(tabs)/home" />;
-  // }
+  if (isSignedIn) {
+    return <Redirect href="/(root)/(tabs)/home" />;
+  }
 
   return <Redirect href="/(auth)/welcome" />;
 };

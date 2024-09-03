@@ -8,6 +8,8 @@ import { Link, useRouter } from "expo-router";
 import OAuth from "@/components/OAuth";
 import { useSignUp } from "@clerk/clerk-expo";
 import ReactNativeModal from "react-native-modal";
+import { fetchAPI } from "@/lib/fetch";
+import { POST } from "../(api)/user+api";
 
 const SignUp = () => {
   const { isLoaded, signUp, setActive } = useSignUp();
@@ -68,6 +70,15 @@ const SignUp = () => {
       });
 
       if (completeSignUp.status === "complete") {
+        await fetchAPI("/(api)/user", {
+          method: "POST",
+          body: JSON.stringify({
+            name: form.name,
+            email: form.email,
+            clerkId: completeSignUp.createdUserId,
+          }),
+        });
+
         // TODO Create user @ database
         await setActive({ session: completeSignUp.createdSessionId });
         setVerification({ ...verification, state: "success" });
@@ -150,10 +161,6 @@ const SignUp = () => {
           }
         >
           <View className="bg-white px-7 py-9 rounded-2xl min-h-[300px]">
-            {/* <Image
-              source={images.check}
-              className="w-[110px] h-[110px] mx-auto my-5"
-            /> */}
             <Text className="text-2xl font-JakartaExtraBold mb-2 ">
               Verified
             </Text>

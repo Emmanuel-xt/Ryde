@@ -1,6 +1,16 @@
+import GoogleTextInput from "@/components/GoogleTextInput";
+import RideCard from "@/components/RideCard";
+import { icons, images } from "@/constants";
 import { SignedIn, SignedOut, useUser } from "@clerk/clerk-expo";
 import { Link } from "expo-router";
-import { FlatList, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const recentRides = [
@@ -40,7 +50,7 @@ const recentRides = [
     destination_longitude: "73.856744",
     ride_time: 491,
     fare_price: "24500.00",
-    payment_status: "paid",
+    payment_status: "pending",
     driver_id: 1,
     user_id: "1",
     created_at: "2024-08-12 06:12:17.683046",
@@ -92,7 +102,7 @@ const recentRides = [
     destination_longitude: "135.502254",
     ride_time: 159,
     fare_price: "7900.00",
-    payment_status: "paid",
+    payment_status: "pending",
     driver_id: 3,
     user_id: "1",
     created_at: "2024-08-12 18:43:54.297838",
@@ -112,12 +122,57 @@ const recentRides = [
 
 export default function Page() {
   const { user } = useUser();
+  const loading = true;
+  const handleSignOUt = () => {};
 
   return (
     <SafeAreaView className=" bg-general-700">
       <FlatList
+        // data={[]}
         data={recentRides?.slice(0, 5)}
         renderItem={({ item }) => <RideCard ride={item} />}
+        className="px-5"
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{
+          paddingBottom: 100,
+        }}
+        ListEmptyComponent={() => (
+          <View className="flex flex-col items-center justify-center">
+            {!loading ? (
+              <>
+                <Image
+                  source={images.noResult}
+                  className="w-40 h-40"
+                  alt="No recent rides"
+                  resizeMode="contain"
+                />
+                <Text>No Recent Reides Found</Text>
+              </>
+            ) : (
+              <>
+                <ActivityIndicator size="large" />
+              </>
+            )}
+          </View>
+        )}
+        ListHeaderComponent={() => (
+          <>
+            <View className="flex flex-row items-center justify-between my-5">
+              <Text className="text-xl font-JakartaSemiBold">
+                Welcome, {user?.emailAddresses[0].emailAddress.split("@")[0]} 👋
+              </Text>
+              <TouchableOpacity
+                onPress={handleSignOUt}
+                className="justify-center item-center w-10 h-10 rounded-full bg-white"
+              >
+                <Image source={icons.out} className="w-4 h-4" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Google TextInput */}
+            <GoogleTextInput />
+          </>
+        )}
       />
     </SafeAreaView>
   );

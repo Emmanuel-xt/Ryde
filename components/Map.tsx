@@ -61,7 +61,7 @@ const Map = () => {
     destinationLongitude,
   } = useLocationStore();
 
-  const { selectedDriver, setSelectedDriver } = useDriverStore();
+  const { selectedDriver, setSelectedDriver, setDrivers } = useDriverStore();
 
   const region = calculateRegion({
     userLongitude,
@@ -73,6 +73,8 @@ const Map = () => {
   const [markers, setMarkers] = useState<MarkerData[]>([]);
 
   useEffect(() => {
+    setDrivers(drivers);
+
     if (Array.isArray(drivers)) {
       if (!userLatitude || !userLongitude) return;
       const newMarkers = generateMarkersFromData({

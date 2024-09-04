@@ -4,7 +4,7 @@ import RideCard from "@/components/RideCard";
 import { icons, images } from "@/constants";
 import { useLocationStore } from "@/store";
 import { SignedIn, SignedOut, useUser } from "@clerk/clerk-expo";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -160,7 +160,22 @@ export default function Page() {
   const loading = true;
 
   const handleSignOUt = () => {};
-  const handleDestinationPress = () => {};
+  const handleDestinationPress = (location: {
+    latitude: number;
+    longitude: number;
+    address: string;
+  }) => {
+    setDestinationLocation(location);
+    router.push("/(root)/find-ride");
+  };
+  const handleDestinationGoPress = (location: {
+    latitude: number;
+    longitude: number;
+    address: string;
+  }) => {
+    setDestinationLocation(location);
+    router.push("/(root)/find-ride");
+  };
 
   return (
     <SafeAreaView className=" bg-general-700">
@@ -211,6 +226,7 @@ export default function Page() {
               icon={icons.search}
               containerStyle="bg-white shadow-md  shadow-neutral-300"
               handlePress={handleDestinationPress}
+              handleGoPress={handleDestinationGoPress}
             />
 
             <>

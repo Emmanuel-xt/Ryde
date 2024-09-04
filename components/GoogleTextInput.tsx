@@ -1,6 +1,6 @@
-import { View, Image } from "react-native";
+import React, { useState } from "react";
+import { View, Image, Text, TouchableOpacity, Alert } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-
 import { icons } from "@/constants";
 import { GoogleInputProps } from "@/types/type";
 
@@ -12,7 +12,31 @@ const GoogleTextInput = ({
   containerStyle,
   textInputBackgroundColor,
   handlePress,
+  handleGoPress,
 }: GoogleInputProps) => {
+  const [inputValue, setInputValue] = useState("");
+
+  const handleManualInput = () => {
+    // Split input into latitude and longitude, and convert to float
+    const [latitudeStr, longitudeStr] = inputValue.split(",");
+    const latitude = parseFloat(latitudeStr);
+    const longitude = parseFloat(longitudeStr);
+
+    // Check if both latitude and longitude are valid numbers
+    if (!isNaN(latitude) && !isNaN(longitude)) {
+      handleGoPress({
+        latitude,
+        longitude,
+        address: `Manual Input: ${latitude}, ${longitude}`,
+      });
+    } else {
+      Alert.alert(
+        "Invalid Input",
+        "Please enter valid coordinates in the format 'latitude,longitude'."
+      );
+    }
+  };
+
   return (
     <View
       className={`flex flex-row items-center justify-center relative z-50 rounded-xl ${containerStyle}`}
@@ -75,7 +99,15 @@ const GoogleTextInput = ({
         textInputProps={{
           placeholderTextColor: "gray",
           placeholder: initialLocation ?? "Where do you want to go?",
+          onChangeText: (text) => setInputValue(text), // Capture input value
         }}
+        renderRightButton={() => (
+          <TouchableOpacity onPress={handleManualInput}>
+            <Text className="bg-blue-600 text-white text-lg p-1 rounded-full">
+              Go
+            </Text>
+          </TouchableOpacity>
+        )}
       />
     </View>
   );

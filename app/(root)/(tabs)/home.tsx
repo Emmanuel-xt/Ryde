@@ -125,7 +125,8 @@ const recentRides = [
 ];
 
 export default function Page() {
-  const { setUserLocation, setDestinationLocation } = useLocationStore();
+  const { setUserLocation, setDestinationLocation, userAddress } =
+    useLocationStore();
 
   const [hasPermission, setHasPermission] = useState(false);
 
@@ -152,9 +153,12 @@ export default function Page() {
       });
     };
 
+    console.log("user address @ useEffect =", userAddress);
+
     requestLocation();
   }, []);
 
+  console.log("user address after useEffect =", userAddress);
   const { user } = useUser();
 
   const loading = true;

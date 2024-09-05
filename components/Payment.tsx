@@ -31,94 +31,65 @@ const Payment = ({
   const { userId } = useAuth();
   const [success, setSuccess] = useState<boolean>(false);
 
-  const openPaymentSheet = async () => {
-    await initializePaymentSheet();
+  const initializePaymentSheet = async () => {
+    try {
+      const { paymentIntent, customer } = await fetchAPI(
+        "/(api)/(stripe)/create",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: fullName || email.split("@")[0],
+            email: email,
+            amount: parseInt(amount) * 100, // Amount in cents
+          }),
+        }
+      );
 
-    const { error } = await presentPaymentSheet();
+      console.log("API response:", { paymentIntent, customer });
 
-    if (error) {
-      Alert.alert(`Error code: ${error.code}`, error.message);
-    } else {
-      setSuccess(true);
+      if (paymentIntent?.client_secret) {
+        const { error } = await initPaymentSheet({
+          paymentIntentClientSecret: paymentIntent.client_secret,
+          merchantDisplayName: "Example, Inc.",
+          customerId: customer,
+          customFlow: false,
+          allowsDelayedPaymentMethods: true,
+        });
+
+        if (error) {
+          console.log("Error initializing payment sheet:", error);
+          return { error };
+        } else {
+          return {};
+        }
+      } else {
+        console.log("Invalid paymentIntent response:", paymentIntent);
+        return { error: { message: "Invalid payment intent response." } };
+      }
+    } catch (error) {
+      console.log("Error initializing payment sheet:", error);
+      return { error: { message: "Failed to initialize payment sheet." } };
     }
   };
 
-  const initializePaymentSheet = async () => {
-    const { error } = await initPaymentSheet({
-      merchantDisplayName: "Example, Inc.",
-      intentConfiguration: {
-        mode: {
-          amount: parseInt(amount) * 100,
-          currencyCode: "usd",
-        },
-        confirmHandler: async (
-          paymentMethod,
-          shouldSavePaymentMethod,
-          intentCreationCallback
-        ) => {
-          const { paymentIntent, customer } = await fetchAPI(
-            "/(api)/(stripe)/create",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                name: fullName || email.split("@")[0],
-                email: email,
-                amount: amount,
-                paymentMethodId: paymentMethod.id,
-              }),
-            }
-          );
+  const openPaymentSheet = async () => {
+    const result = await initializePaymentSheet();
 
-          if (paymentIntent.client_secret) {
-            const { result } = await fetchAPI("/(api)/(stripe)/pay", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                payment_method_id: paymentMethod.id,
-                payment_intent_id: paymentIntent.id,
-                customer_id: customer,
-                client_secret: paymentIntent.client_secret,
-              }),
-            });
+    // Check if result exists and has an error
+    if (result && result.error) {
+      Alert.alert("Initialization Error", result.error.message);
+      return;
+    }
 
-            if (result.client_secret) {
-              await fetchAPI("/(api)/ride/create", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  origin_address: userAddress,
-                  destination_address: destinationAddress,
-                  origin_latitude: userLatitude,
-                  origin_longitude: userLongitude,
-                  destination_latitude: destinationLatitude,
-                  destination_longitude: destinationLongitude,
-                  ride_time: rideTime.toFixed(0),
-                  fare_price: parseInt(amount) * 100,
-                  payment_status: "paid",
-                  driver_id: driverId,
-                  user_id: userId,
-                }),
-              });
+    const { error: paymentError } = await presentPaymentSheet();
 
-              intentCreationCallback({
-                clientSecret: result.client_secret,
-              });
-            }
-          }
-        },
-      },
-      returnURL: "ryde://book-ride",
-    });
-
-    if (!error) {
-      // setLoading(true);
+    if (paymentError) {
+      Alert.alert(`Error code: ${paymentError.code}`, paymentError.message);
+    } else {
+      setSuccess(true);
     }
   };
 
@@ -126,9 +97,35 @@ const Payment = ({
     <>
       <CustomButton
         title="Confirm Ride"
-        className="my-10"
-        onPress={openPaymentSheet}
+        className=""
+        onPress={() => setSuccess(true)}
       />
+      <ReactNativeModal
+        isVisible={success}
+        onBackdropPress={() => setSuccess(false)}
+      >
+        <View className="flex flex-col items-center justify-center bg-white p-7 rounded-2xl">
+          <Image source={images.check} className="w-28 h-28 mt-5" />
+
+          <Text className="text-2xl text-center font-JakartaBold mt-5">
+            Booking placed successfully
+          </Text>
+
+          <Text className="text-md text-general-200 font-JakartaRegular text-center mt-3">
+            Thank you for your booking. Your reservation has been successfully
+            placed. Please proceed with your trip.
+          </Text>
+
+          <CustomButton
+            title="Back Home"
+            onPress={() => {
+              setSuccess(false);
+              router.push("/(root)/(tabs)/home");
+            }}
+            className="mt-5"
+          />
+        </View>
+      </ReactNativeModal>
     </>
   );
 };

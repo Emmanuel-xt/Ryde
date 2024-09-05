@@ -3,7 +3,7 @@ import Map from "@/components/Map";
 import RideCard from "@/components/RideCard";
 import { icons, images } from "@/constants";
 import { useLocationStore } from "@/store";
-import { SignedIn, SignedOut, useUser } from "@clerk/clerk-expo";
+import { SignedIn, SignedOut, useAuth, useUser } from "@clerk/clerk-expo";
 import { Link, router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -20,6 +20,7 @@ import * as Location from "expo-location";
 const recentRides = [
   {
     ride_id: "1",
+    user_email: "eokeke320@gmail.com",
     origin_address: "Kathmandu, Nepal",
     destination_address: "Pokhara, Nepal",
     origin_latitude: "27.717245",
@@ -46,6 +47,8 @@ const recentRides = [
   },
   {
     ride_id: "2",
+    user_email: "eokeke320@gmail.com",
+
     origin_address: "Jalkot, MH",
     destination_address: "Pune, Maharashtra, India",
     origin_latitude: "18.609116",
@@ -72,6 +75,8 @@ const recentRides = [
   },
   {
     ride_id: "3",
+    user_email: "eokeke320@gmail.com",
+
     origin_address: "Zagreb, Croatia",
     destination_address: "Rijeka, Croatia",
     origin_latitude: "45.815011",
@@ -98,6 +103,8 @@ const recentRides = [
   },
   {
     ride_id: "4",
+    user_email: "eokeke320@gmail.com",
+
     origin_address: "Okayama, Japan",
     destination_address: "Osaka, Japan",
     origin_latitude: "34.655531",
@@ -163,7 +170,12 @@ export default function Page() {
 
   const loading = true;
 
-  const handleSignOUt = () => {};
+  const { signOut } = useAuth();
+
+  const handleSignOUt = () => {
+    signOut();
+    router.replace("/(auth)/sign-in");
+  };
   const handleDestinationPress = (location: {
     latitude: number;
     longitude: number;
@@ -219,7 +231,7 @@ export default function Page() {
               </Text>
               <TouchableOpacity
                 onPress={handleSignOUt}
-                className="justify-center item-center w-10 h-10 rounded-full bg-white"
+                className="flex justify-center items-center w-10 h-10 rounded-full bg-white"
               >
                 <Image source={icons.out} className="w-4 h-4" />
               </TouchableOpacity>

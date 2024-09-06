@@ -11,10 +11,13 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
 import { tokenCache } from "@/lib/auth";
+import { LogBox } from "react-native";
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 console.log("Publishable Key:", publishableKey);
 SplashScreen.preventAutoHideAsync();
+
+LogBox.ignoreLogs(["Clerk:"]);
 
 export default function RootLayout() {
   // const colorScheme = useColorScheme();

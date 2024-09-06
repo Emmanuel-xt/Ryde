@@ -40,11 +40,11 @@ const Onboarding = () => {
               resizeMode="contain"
             />
             <View className="flex flex-row items-center w-full mt-10">
-              <Text className="text-black teext-3xl font-bold mx-10 text-center">
+              <Text className="text-black text-3xl font-bold mx-10 text-center">
                 {item.title}
               </Text>
             </View>
-            <Text className="text-lg font-JakartaSemiBold text-center mt-3 mx-10">
+            <Text className="text-lg font-JakartaSemiBold text-[#858585] text-center mt-3 mx-10">
               {item.description}
             </Text>
           </View>
@@ -58,7 +58,7 @@ const Onboarding = () => {
             ? router.replace("/(auth)/sign-up")
             : swiperRef.current?.scrollBy(1)
         }
-        className="w-11/12 mt-10 "
+        className="w-11/12 mt-10 mb-10 "
       />
     </SafeAreaView>
   );

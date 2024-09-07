@@ -20,6 +20,8 @@ export async function POST(request: Request) {
             ${clerkId}
         )`;
 
+        console.log('user was created', response)
+
         return new Response(JSON.stringify({ data: response }), { status: 201 });
     } catch (error: any) {
         console.log("error inserting user", error);
